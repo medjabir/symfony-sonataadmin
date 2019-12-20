@@ -1,7 +1,30 @@
 # config/packages/sonata_admin.yaml
 
+services:
+    # admin.category:
+    #     class: App\Admin\CategoryAdmin
+    #     arguments: [~, App\Entity\Category, ~]
+    #     tags:
+    #         - { name: sonata.admin, manager_type: orm, label: Category }
+
+    admin.blog_post:
+        class: App\Admin\BlogPostAdmin
+        arguments: [~, App\Entity\BlogPost, ~]
+        tags:
+            - { name: sonata.admin, manager_type: orm, label: 'Blog Post' }
+
+sonata_admin:
+    templates:
+        search:              '@SonataAdmin/Core/search.html.twig'
+        search_result_block: '@SonataAdmin/Block/block_search_result.html.twig'
+
 sonata_block:
     blocks:
         # enable the SonataAdminBundle block
         sonata.admin.block.admin_list:
             contexts: [admin]
+
+        sonata.admin.block.search_result:
+            contexts: [admin]
+
+    

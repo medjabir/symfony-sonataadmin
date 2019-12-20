@@ -7,9 +7,9 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\CategoryRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\AuthorRepository")
  */
-class Category
+class Author
 {
     /**
      * @ORM\Id()
@@ -19,18 +19,18 @@ class Category
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255)
      */
     private $name;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\BlogPost", mappedBy="category")
+     * @ORM\ManyToMany(targetEntity="App\Entity\BlogPost", inversedBy="authors")
      */
-    private $blogPosts;
+    private $blog_post;
 
     public function __construct()
     {
-        $this->blogPosts = new ArrayCollection();
+        $this->blog_post = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -43,7 +43,7 @@ class Category
         return $this->name;
     }
 
-    public function setName(?string $name): self
+    public function setName(string $name): self
     {
         $this->name = $name;
 
@@ -53,16 +53,15 @@ class Category
     /**
      * @return Collection|BlogPost[]
      */
-    public function getBlogPosts(): Collection
+    public function getBlogPost(): Collection
     {
-        return $this->blogPosts;
+        return $this->blog_post;
     }
 
     public function addBlogPost(BlogPost $blogPost): self
     {
-        if (!$this->blogPosts->contains($blogPost)) {
-            $this->blogPosts[] = $blogPost;
-            $blogPost->setCategory($this);
+        if (!$this->blog_post->contains($blogPost)) {
+            $this->blog_post[] = $blogPost;
         }
 
         return $this;
@@ -70,14 +69,18 @@ class Category
 
     public function removeBlogPost(BlogPost $blogPost): self
     {
-        if ($this->blogPosts->contains($blogPost)) {
-            $this->blogPosts->removeElement($blogPost);
-            // set the owning side to null (unless already changed)
-            if ($blogPost->getCategory() === $this) {
-                $blogPost->setCategory(null);
-            }
+        if ($this->blog_post->contains($blogPost)) {
+            $this->blog_post->removeElement($blogPost);
         }
 
         return $this;
     }
+
+
+    public function __toString() {
+
+        return $this->getName() != null ? $this->getName() : 'Author';
+    }
+
+
 }

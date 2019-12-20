@@ -2,8 +2,9 @@
 
 namespace App\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\BlogPostRepository")
@@ -23,29 +24,23 @@ class BlogPost
     private $title;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="string", length=255)
      */
     private $body;
 
     /**
-     * @ORM\Column(type="boolean")
-     */
-    private $draft = false;
-    
-     /**
-     * @ORM\ManyToOne(targetEntity="Category", inversedBy="blogPosts")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Category", inversedBy="blogPosts")
      */
     private $category;
 
-    public function getCategory(): ?Category
-    {
-        return $this->category;
-    }
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Author", mappedBy="blog_post")
+     */
+    private $authors;
 
-    public function setCategory(?Category $category): self
+    public function __construct()
     {
-        $this->category = $category;
-        return $this;
+        $this->authors = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -77,19 +72,43 @@ class BlogPost
         return $this;
     }
 
-    public function getDraft(): ?bool
+    public function getCategory(): ?Category
     {
-        return $this->draft;
+        return $this->category;
     }
 
-    public function setDraft(bool $draft): self
+    public function setCategory(?Category $category): self
     {
-        $this->draft = $draft;
+        $this->category = $category;
 
         return $this;
     }
 
+    /**
+     * @return Collection|Author[]
+     */
+    public function getAuthors(): Collection
+    {
+        return $this->authors;
+    }
 
+    public function addAuthor(Author $author): self
+    {
+        if (!$this->authors->contains($author)) {
+            $this->authors[] = $author;
+            $author->addBlogPost($this);
+        }
 
+        return $this;
+    }
 
+    public function removeAuthor(Author $author): self
+    {
+        if ($this->authors->contains($author)) {
+            $this->authors->removeElement($author);
+            $author->removeBlogPost($this);
+        }
+
+        return $this;
+    }
 }
